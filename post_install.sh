@@ -5,6 +5,17 @@ set -x
 # fetch currently installed postgres version for more dynamic install process
 POSTGRES_VERSION="$( pkg info | grep -E 'postgresql[0-9]+-server' | awk -F '-' '{print $1}' | sed 's/postgresql//' )"
 
+# Thank you Asigra plugin for your service on this hack
+echo "Figure out our Network IP"
+#Very Dirty Hack to get the ip for dhcp, the problem is that IOCAGE_PLUGIN_IP doesent work on DCHP clients
+#cat /var/db/dhclient.leases* | grep fixed-address | uniq | cut -d " " -f4 | cut -d ";" -f1 > /root/dhcpip
+#netstat -nr | grep lo0 | awk '{print $1}' | uniq | cut -d " " -f4 | cut -d ";" -f1 > /root/dhcpip
+netstat -nr | grep lo0 | grep -v '::' | grep -v '127.0.0.1' | awk '{print $1}' | head -n 1 > /root/dhcpip
+#netstat -nr | grep lo0 | awk '{print $1}' > /root/dhcpip
+#sed -i.bak '2,$d' /root/dhcpip
+IP=`cat /root/dhcpip`
+#rm /root/dhcpip.bak
+
 # Enable service
 sysrc gitea_enable=YES 2>/dev/null
 
@@ -19,10 +30,13 @@ sleep 5
 service gitea stop 2>/dev/null
 sleep 5
 
-# Remove default config to allow use of the web installer, set permissions
-#rm /usr/local/etc/gitea/conf/app.ini
+# set permissions
 chown -R git:git /usr/local/etc/gitea/conf
 chown -R git:git /usr/local/share/gitea
+
+# gitea runs on localhost by default, fix this
+sed -i -e "s/localhost/${IP}/g" /usr/local/etc/gitea/conf/app.ini
+sed -i -e "s/127.0.0.1/${IP}/g" /usr/local/etc/gitea/conf/app.ini
 
 # Start service
 service gitea start
@@ -79,17 +93,6 @@ echo "Database Type: PostgresSQL" >> /root/PLUGIN_INFO
 echo "Database Name: $DB" >> /root/PLUGIN_INFO
 echo "Database User: $USER" >> /root/PLUGIN_INFO
 echo "Database Password: $PASS" >> /root/PLUGIN_INFO
-
-# Thank you Asigra plugin for your service on this hack
-echo "Figure out our Network IP"
-#Very Dirty Hack to get the ip for dhcp, the problem is that IOCAGE_PLUGIN_IP doesent work on DCHP clients
-#cat /var/db/dhclient.leases* | grep fixed-address | uniq | cut -d " " -f4 | cut -d ";" -f1 > /root/dhcpip
-#netstat -nr | grep lo0 | awk '{print $1}' | uniq | cut -d " " -f4 | cut -d ";" -f1 > /root/dhcpip
-netstat -nr | grep lo0 | grep -v '::' | grep -v '127.0.0.1' | awk '{print $1}' | head -n 1 > /root/dhcpip
-#netstat -nr | grep lo0 | awk '{print $1}' > /root/dhcpip
-#sed -i.bak '2,$d' /root/dhcpip
-IP=`cat /root/dhcpip`
-#rm /root/dhcpip.bak
 
 # Show user database details
 echo "-------------------------------------------------------"
