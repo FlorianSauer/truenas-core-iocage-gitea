@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 # fetch currently installed postgres version for more dynamic install process
 POSTGRES_VERSION="$( pkg info | grep -E 'postgresql[0-9]+-server' | awk -F '-' '{print $1}' | sed 's/postgresql//' )"
 
