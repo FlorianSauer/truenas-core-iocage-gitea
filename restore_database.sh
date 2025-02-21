@@ -6,4 +6,12 @@ if [ -z "$JAIL" ]; then
     exit 1
 fi
 
-iocage exec "$JAIL" sh -c "psql -U postgres -d gitea -f /postgres_dump/gitea_pg_dump.sql"
+# restore database
+iocage exec "$JAIL" sh -c "pg_restore -c -U postgres -d gitea /postgres_dump/gitea_pg_dump.sql"
+
+# fix potential errors
+iocage exec "$JAIL" sh -c "su git -c 'gitea migrate'"
+iocage exec "$JAIL" sh -c "su git -c 'gitea admin regenerate keys'"
+
+# print the gitea doctor info
+iocage exec "$JAIL" sh -c "su git -c 'gitea doctor check'"
