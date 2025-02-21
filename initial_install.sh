@@ -11,7 +11,7 @@ if [ -z "$JAIL" ]; then
 fi
 
 # first we need to shut down gitea
-iocage exec "$JAIL" sh -c "service gitea stop"
+iocage exec "$JAIL" sh -c "service gitea stop" > /dev/null 2>&1
 
 # then we need to run the web installer
 echo "Please press CTRL+C when you are finished with the first setup."
