@@ -20,7 +20,7 @@ service gitea stop 2>/dev/null
 sleep 5
 
 # Remove default config to allow use of the web installer, set permissions
-rm /usr/local/etc/gitea/conf/app.ini
+#rm /usr/local/etc/gitea/conf/app.ini
 chown -R git:git /usr/local/etc/gitea/conf
 chown -R git:git /usr/local/share/gitea
 
