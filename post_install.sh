@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# fetch currently installed postgres version for more dynamic install process
+POSTGRES_VERSION="$( pkg info | grep -E 'postgresql[0-9]+-server' | awk -F '-' '{print $1}' | sed 's/postgresql//' )"
+
 # Enable service
 sysrc gitea_enable=YES 2>/dev/null
 
@@ -36,6 +39,10 @@ sleep 5
 
 USER="gitea"
 DB="gitea"
+DB_DUMP="/postgres_dump/gitea_pg_dump.sql"
+
+# create dump dir
+mkdir -p "$(dirname $DB_DUMP)"
 
 # Save the config values
 echo "$DB" > /root/dbname
@@ -57,8 +64,8 @@ psql -d template1 -U postgres -c "ALTER USER ${USER} WITH PASSWORD '${PASS}';" 2
 psql -U postgres -d ${DB} -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;" 2>/dev/null
 
 # Fix permission for postgres
-echo "listen_addresses = '*'" >> /var/db/postgres/data11/postgresql.conf 2>/dev/null
-echo "host  all  all 0.0.0.0/0 md5" >> /var/db/postgres/data11/pg_hba.conf 2>/dev/null
+echo "listen_addresses = '*'" >> "/var/db/postgres/data${POSTGRES_VERSION}/postgresql.conf" 2>/dev/null
+echo "host  all  all 0.0.0.0/0 md5" >> "/var/db/postgres/data${POSTGRES_VERSION}/pg_hba.conf" 2>/dev/null
 
 # Restart postgresql after config change
 service postgresql restart 2>/dev/null
@@ -91,5 +98,9 @@ echo "Database Type: PostgresSQL"
 echo "Database Name: $DB"
 echo "Database User: $USER"
 echo "Database Password: $PASS"
+echo "Database Dump Location: $DB_DUMP"
 echo "To begin the installation go to http://${IP}:3000/install"
 echo "To review this information again click Post Install Notes"
+echo "To migrate a installation, mount a directory to $(dirname $DB_DUMP) and execute the dump_database.sh script."
+echo "The new installation needs the same directory mounted. Then run the restore_database.sh script."
+echo "-------------------------------------------------------"
