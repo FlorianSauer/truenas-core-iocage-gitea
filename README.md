@@ -7,6 +7,8 @@ run the following command in your terminal:
 git clone https://github.com/FlorianSauer/truenas-core-iocage-gitea.git
 # you might need to update the postgres packages set in gitea.json to newer versions
 iocage fetch -P ./gitea.json
+# after initial jail installation, run the gitea web installer
+bash initial_install.sh <gitea jail>
 ```
 
 ## How to migrate
