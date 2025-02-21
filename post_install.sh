@@ -37,6 +37,8 @@ chown -R git:git /usr/local/share/gitea
 # gitea runs on localhost by default, fix this
 sed -i -e "s/localhost/${IP}/g" /usr/local/etc/gitea/conf/app.ini
 sed -i -e "s/127.0.0.1/${IP}/g" /usr/local/etc/gitea/conf/app.ini
+# also enable the web install under /install
+sed -i -e "s/INSTALL_LOCK[[:space:]]*=[[:space:]]*true/INSTALL_LOCK   = false/g" /usr/local/etc/gitea/conf/app.ini
 
 # Start service
 service gitea start
