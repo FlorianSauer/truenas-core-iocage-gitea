@@ -40,10 +40,6 @@ sed -i -e "s/127.0.0.1/${IP}/g" /usr/local/etc/gitea/conf/app.ini
 # also enable the web install under /install
 sed -i -e "s/INSTALL_LOCK[[:space:]]*=[[:space:]]*true/INSTALL_LOCK   = false/g" /usr/local/etc/gitea/conf/app.ini
 
-# Start service
-service gitea start
-sleep 5
-
 # Setup Postgres
 sysrc -f /etc/rc.conf postgresql_enable="YES"
 
@@ -104,7 +100,7 @@ echo "Database Name: $DB"
 echo "Database User: $USER"
 echo "Database Password: $PASS"
 echo "Database Dump Location: $DB_DUMP"
-echo "To begin the installation go to http://${IP}:3000/install"
+echo "To begin the installation run the initial_install.sh script and go to http://${IP}:3000"
 echo "To review this information again click Post Install Notes"
 echo "To migrate a installation, mount a directory to $(dirname $DB_DUMP) and execute the dump_database.sh script."
 echo "The new installation needs the same directory mounted. Then run the restore_database.sh script."
