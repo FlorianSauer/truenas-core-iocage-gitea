@@ -43,8 +43,6 @@ sed -i -e "s/INSTALL_LOCK[[:space:]]*=[[:space:]]*true/INSTALL_LOCK   = false/g"
 # Start service
 service gitea start
 sleep 5
-# Installer only comes up if there is no config so we nuke it once more to be sure
-rm /usr/local/etc/gitea/conf/app.ini 2>/dev/null
 
 # Setup Postgres
 sysrc -f /etc/rc.conf postgresql_enable="YES"
